@@ -1,0 +1,8 @@
+database:
+  driver: mysql
+  host: localhost
+  dbname: transactions
+  login: root
+  password: secret
+  charset: utf8
+

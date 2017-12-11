@@ -1,4 +1,7 @@
 <?php
+
 namespace App\Exception;
 
-class ConfigNotFoundException extends \Exception {}
+class ConfigNotFoundException extends \Exception
+{
+}

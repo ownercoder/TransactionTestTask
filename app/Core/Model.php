@@ -7,4 +7,6 @@ namespace App\Core;
  *
  * @package App\Core
  */
-class Model {}
+class Model
+{
+}

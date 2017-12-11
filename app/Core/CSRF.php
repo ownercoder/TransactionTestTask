@@ -1,14 +1,14 @@
 <?php
-namespace App\Core;
 
-use App\Core\Session;
+namespace App\Core;
 
 /**
  * Class CSRF
  *
  * @package App\Core
  */
-class CSRF {
+class CSRF
+{
     /**
      * Возвращает csrf токен
      *

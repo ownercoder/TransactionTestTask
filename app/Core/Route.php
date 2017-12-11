@@ -2,7 +2,6 @@
 
 namespace App\Core;
 
-use App\Controllers;
 use App\Exception\MiddlewareNotFoundException;
 
 /**
@@ -56,7 +55,16 @@ class Route
         }
 
         $this->controller = new $namespacedName($this);
-        $this->action = $actionName ?? $this->defaultAction;
+        $this->action     = $actionName ?? $this->defaultAction;
+    }
+
+    /**
+     * Выполняет перенаправление на страницу 404
+     */
+    public static function ErrorPage404()
+    {
+        $host = 'https://' . $_SERVER['HTTP_HOST'] . '/';
+        header('Location: ' . $host . 'NotFound');
     }
 
     /**
@@ -88,9 +96,9 @@ class Route
         $middlewareFail = false;
 
         $middlewareList = $this->controller->getMiddleware();
-        foreach($middlewareList as $item) {
+        foreach ($middlewareList as $item) {
             list($name, $useActionList) = $item;
-            $className = ucfirst($name);
+            $className       = ucfirst($name);
             $namespacedClass = 'App\\Middleware\\' . $className;
 
             if (!in_array($this->action, $useActionList)) {
@@ -116,8 +124,8 @@ class Route
     /**
      * Выполняет переадресацию
      *
-     * @param string $url Адрес
-     * @param string $message Сообщение с ошибкой
+     * @param string $url            Адрес
+     * @param string $message        Сообщение с ошибкой
      * @param string $successMessage Сообщение с успехом
      */
     public function redirect($url, $message = '', $successMessage = '')
@@ -133,17 +141,8 @@ class Route
         }
 
         $host = 'https://' . $_SERVER['HTTP_HOST'] . '/';
-        $url = ltrim($url, '/');
+        $url  = ltrim($url, '/');
         header('Location: ' . $host . $url);
-    }
-
-    /**
-     * Выполняет перенаправление на страницу 404
-     */
-    public static function ErrorPage404()
-    {
-        $host = 'https://' . $_SERVER['HTTP_HOST'] . '/';
-        header('Location: ' . $host . 'NotFound');
     }
 
 }

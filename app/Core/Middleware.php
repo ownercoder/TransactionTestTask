@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Core;
 
 /**
@@ -6,7 +7,8 @@ namespace App\Core;
  *
  * @package App\Core
  */
-class Middleware {
+class Middleware
+{
     /**
      * Основной обработчик middleware
      *

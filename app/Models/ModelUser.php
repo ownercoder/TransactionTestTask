@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Models;
 
 use App\Core\Database;
@@ -21,7 +22,7 @@ class ModelUser extends Model
      */
     public function getUser($login)
     {
-        $pdo = Database::instance()->getPdo();
+        $pdo       = Database::instance()->getPdo();
         $statement = $pdo->prepare('SELECT * FROM `users` WHERE `login` = :username LIMIT 1');
         $statement->execute(['username' => $login]);
         return $statement->fetchObject();
@@ -31,7 +32,7 @@ class ModelUser extends Model
      * Выполняет списание с баланса пользователя
      *
      * @param \stdClass $user
-     * @param double $cashOutSum
+     * @param double    $cashOutSum
      *
      * @return double
      * @throws CashOutBalanceException
@@ -48,7 +49,7 @@ class ModelUser extends Model
         $errorMessage = '';
 
         if ($cashOutSum > $currentBalance) {
-            $errorMessage = 'You cannot cash out cashOutSum greater than you have on balance';
+            $errorMessage = sprintf('You cannot cash out %01.2f greater than you have on balance', $cashOutSum);
         } elseif ($cashOutSum <= 0) {
             $errorMessage = 'Please enter greater than 0';
         }

@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Middleware;
 
 use App\Core\Middleware;
@@ -9,7 +10,8 @@ use App\Core\Middleware;
  *
  * @package App\Middleware
  */
-class Csrf extends Middleware {
+class Csrf extends Middleware
+{
     /**
      * @inheritdoc
      */

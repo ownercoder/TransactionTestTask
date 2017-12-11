@@ -7,44 +7,32 @@ namespace App\Core;
  *
  * @package App\Core
  */
-class Controller {
+class Controller
+{
 
     /**
      * @var Route Объект роутера
      */
-	protected $router;
+    protected $router;
     /**
      * @var View Объект представления
      */
-	protected $view;
+    protected $view;
 
     /**
      * @var array Список middleware
      */
-	protected $middleware = [];
+    protected $middleware = [];
 
     /**
      * Controller constructor.
      *
      * @param Route $router
      */
-	public function __construct($router)
-	{
-		$this->view = new View();
-		$this->router = $router;
-	}
-
-    /**
-     * Объявить middleware
-     *
-     * @param array $middleware Список middleware для выполнения
-     * @param array $useActionList Список страниц для выполнения
-     */
-	protected function middleware($middleware, $useActionList)
+    public function __construct($router)
     {
-        foreach((array)$middleware as $item) {
-            $this->middleware[] = [$item, $useActionList];
-        }
+        $this->view   = new View();
+        $this->router = $router;
     }
 
     /**
@@ -55,5 +43,16 @@ class Controller {
     public function getMiddleware()
     {
         return $this->middleware;
+    }
+
+    /**
+     * Объявить middleware
+     *
+     * @param string $middleware    Список middleware для выполнения
+     * @param array  $useActionList Список страниц для выполнения
+     */
+    protected function middleware($middleware, $useActionList)
+    {
+        $this->middleware[] = [$middleware, $useActionList];
     }
 }

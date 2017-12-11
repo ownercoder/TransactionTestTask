@@ -17,11 +17,11 @@ class ControllerNotFound extends Controller
      * @throws \App\Exception\LayoutNotFoundException
      * @throws \App\Exception\TemplateNotFoundException
      */
-	function index()
-	{
+    function index()
+    {
         header('HTTP/1.1 404 Not Found');
         header("Status: 404 Not Found");
-		$this->view->generate('404');
-	}
+        $this->view->generate('404');
+    }
 
 }

@@ -1,8 +1,9 @@
 <?php
+
 namespace App\Controllers;
 
+use App\Core\Auth;
 use App\Core\Controller;
-use App\Core\Session;
 use App\Exceptions\CashOutBalanceException;
 use App\Models\ModelUser;
 
@@ -30,14 +31,14 @@ class ControllerMain extends Controller
      * @throws \App\Exception\TemplateNotFoundException
      */
     public function index()
-	{
+    {
         $this->view->generate('login', 'layout-login');
-	}
+    }
 
     /**
      * Действие входа, передаются данные с формы входа
      */
-	public function login()
+    public function login()
     {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             return;
@@ -47,16 +48,14 @@ class ControllerMain extends Controller
         $password = $_POST['password'];
 
         $model = new ModelUser();
-        $user = $model->getUser($username);
+        $user  = $model->getUser($username);
         if (empty($user)) {
             $this->router->redirect('/', 'User not found');
             return;
         }
 
-        $passwordHashed = $user->password;
-        if (password_verify($password, $passwordHashed)) {
-            Session::write('user', serialize($user));
-            Session::commit();
+        if (Auth::instance()->verifyPassword($user, $password)) {
+            Auth::instance()->authenticate($user);
             $this->router->redirect('/main/personal');
         } else {
             $this->router->redirect('/', 'Wrong password');
@@ -71,7 +70,7 @@ class ControllerMain extends Controller
      */
     public function personal()
     {
-        $user = get_user();
+        $user = Auth::instance()->user();
 
         $this->view->generate('personal', 'layout', ['user' => $user]);
     }
@@ -86,10 +85,10 @@ class ControllerMain extends Controller
             return;
         }
 
-        $userModel = new ModelUser();
+        $userModel  = new ModelUser();
         $cashOutSum = doubleval($_POST['sum']);
 
-        $user = get_user();
+        $user = Auth::instance()->user();
 
         try {
             $newBalance = $userModel->cashOutUserBalance($user, $cashOutSum);
@@ -99,8 +98,7 @@ class ControllerMain extends Controller
         }
 
         $user->balance = $newBalance;
-        Session::write('user', serialize($user));
-        Session::close();
+        Auth::instance()->updateAuthUser($user);
 
         $this->router->redirect('/main/personal', null, 'Success cash out');
     }

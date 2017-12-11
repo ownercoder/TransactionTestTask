@@ -28,19 +28,25 @@ class Session
     }
 
     /**
-     * Уничтожает сессию
+     * Инициализация сессий
+     *
+     * @return bool
      */
-    public static function destroy()
+    private static function _init()
     {
-        if ('' !== session_id()) {
-            $_SESSION  = array();
-            $paramList = session_get_cookie_params();
-            setcookie(session_name(), '', time() - 42000,
-                $paramList["path"], $paramList["domain"],
-                $paramList["secure"], $paramList["httponly"]
+        if (session_status() == PHP_SESSION_NONE) {
+            $secure   = true;
+            $httponly = true;
+
+            $params = session_get_cookie_params();
+            session_set_cookie_params($params['lifetime'],
+                $params['path'], $params['domain'],
+                $secure, $httponly
             );
-            session_destroy();
+            return session_start();
         }
+
+        return session_regenerate_id(true);
     }
 
     /**
@@ -64,6 +70,35 @@ class Session
     }
 
     /**
+     * Актуализация времени жизни сессии
+     */
+    private static function _age()
+    {
+        $last = isset($_SESSION['LAST_ACTIVE']) ? $_SESSION['LAST_ACTIVE'] : false;
+
+        if (false !== $last && (time() - $last > self::$SESSION_AGE)) {
+            self::destroy();
+        }
+        $_SESSION['LAST_ACTIVE'] = time();
+    }
+
+    /**
+     * Уничтожает сессию
+     */
+    public static function destroy()
+    {
+        if (session_status() == PHP_SESSION_ACTIVE) {
+            $_SESSION  = array();
+            $paramList = session_get_cookie_params();
+            setcookie(session_name(), '', time() - 42000,
+                $paramList["path"], $paramList["domain"],
+                $paramList["secure"], $paramList["httponly"]
+            );
+            session_destroy();
+        }
+    }
+
+    /**
      * Удаляет по ключу данные сессии
      *
      * @param string $key Ключ сохраненных данных
@@ -79,7 +114,7 @@ class Session
      * Записывает данные сессии
      *
      * @param string $key
-     * @param mixed $value
+     * @param mixed  $value
      *
      * @return mixed
      */
@@ -93,6 +128,7 @@ class Session
 
     /**
      * Фиксация данных и закрытие сессии
+     *
      * @see close
      */
     public static function commit()
@@ -101,49 +137,14 @@ class Session
     }
 
     /**
-     * Актуализация времени жизни сессии
-     */
-    private static function _age()
-    {
-        $last = isset($_SESSION['LAST_ACTIVE']) ? $_SESSION['LAST_ACTIVE'] : false;
-
-        if (false !== $last && (time() - $last > self::$SESSION_AGE)) {
-            self::destroy();
-        }
-        $_SESSION['LAST_ACTIVE'] = time();
-    }
-
-    /**
-     * Инициализация сессий
+     * Закрывает сессию с фиксацией изменений
      *
      * @return bool
      */
-    private static function _init()
-    {
-        if (session_status() == PHP_SESSION_NONE) {
-            $secure   = true;
-            $httponly = true;
-
-            $params = session_get_cookie_params();
-            session_set_cookie_params($params['lifetime'],
-                $params['path'], $params['domain'],
-                $secure, $httponly
-            );
-            return session_start();
-        }
-
-        return session_regenerate_id(true);
-    }
-
-    /**
-     * Закрывает сессию с фиксацией изменений
-     *
-     * @return bool|void
-     */
     public static function close()
     {
-        if (session_id() !== '') {
-            return session_write_close();
+        if (session_status() == PHP_SESSION_ACTIVE) {
+            session_write_close();
         }
 
         return true;
